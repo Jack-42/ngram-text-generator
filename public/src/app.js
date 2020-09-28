@@ -14,6 +14,8 @@ const text = "n-gram models are widely used in statistical natural language proc
     "\n" +
     "Handcrafted features of various sorts are also used, for example variables that represent the position of a word in a sentence or the general topic of discourse. In addition, features based on the structure of the potential result, such as syntactic considerations, are often used. Such features are also used as part of the likelihood function, which makes use of the observed data. Conventional linguistic theory can be incorporated in these features (although in practice, it is rare that features specific to generative or other particular theories of grammar are incorporated, as computational linguists tend to be \"agnostic\" towards individual theories of grammar[citation needed]). ";
 
+const order = 3;
+
 function runApp() {
     // split text into tokens
     // regex: \s => whitespace (including tab, newline), + => one or more
@@ -22,4 +24,18 @@ function runApp() {
     for (const token of tokens) {
         console.log(token);
     }
+    console.log("\n\n");
+
+    // get ngrams from tokens
+    const ngrams = [];
+    for (let i = 0; i <= tokens.length - order; i++) {
+        const ngram = [];
+        for (let j = 0; j < order; j++) {
+            ngram.push(tokens[i + j]);
+        }
+        ngrams.push(ngram);
+    }
+
+    console.log("ngrams length: " + ngrams.length);
+    console.log(ngrams);
 }
