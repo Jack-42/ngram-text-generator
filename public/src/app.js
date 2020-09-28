@@ -1,4 +1,4 @@
-const text = "n-gram models are widely used in statistical natural language processing. In speech recognition, phonemes and sequences of phonemes are modeled using a n-gram distribution. For parsing, words are modeled such that each n-gram is composed of n words. For language identification, sequences of characters/graphemes (e.g., letters of the alphabet) are modeled for different languages.[4] For sequences of characters, the 3-grams (sometimes referred to as \"trigrams\") that can be generated from \"good morning\" are \"goo\", \"ood\", \"od \", \"d m\", \" mo\", \"mor\" and so forth, counting the space character as a gram (sometimes the beginning and end of a text are modeled explicitly, adding \"_ ⁠_g\", \"_go\", \"ng_\", and \"g_ ⁠_\"). For sequences of words, the trigrams (shingles) that can be generated from \"the dog smelled like a skunk\" are \"# the dog\", \"the dog smelled\", \"dog smelled like\", \"smelled like a\", \"like a skunk\" and \"a skunk #\".\n" +
+const trainingText = "n-gram models are widely used in statistical natural language processing. In speech recognition, phonemes and sequences of phonemes are modeled using a n-gram distribution. For parsing, words are modeled such that each n-gram is composed of n words. For language identification, sequences of characters/graphemes (e.g., letters of the alphabet) are modeled for different languages.[4] For sequences of characters, the 3-grams (sometimes referred to as \"trigrams\") that can be generated from \"good morning\" are \"goo\", \"ood\", \"od \", \"d m\", \" mo\", \"mor\" and so forth, counting the space character as a gram (sometimes the beginning and end of a text are modeled explicitly, adding \"_ ⁠_g\", \"_go\", \"ng_\", and \"g_ ⁠_\"). For sequences of words, the trigrams (shingles) that can be generated from \"the dog smelled like a skunk\" are \"# the dog\", \"the dog smelled\", \"dog smelled like\", \"smelled like a\", \"like a skunk\" and \"a skunk #\".\n" +
     "\n" +
     "Practitioners[who?] more interested in multiple word terms might preprocess strings to remove spaces.[who?] Many simply collapse whitespace to a single space while preserving paragraph marks, because the whitespace is frequently either an element of writing style or introduces layout or presentation not required by the prediction and deduction methodology. Punctuation is also commonly reduced or removed by preprocessing and is frequently used to trigger functionality.\n" +
     "\n" +
@@ -19,16 +19,27 @@ const order = 3;
 function runApp() {
     // split text into tokens
     // regex: \s => whitespace (including tab, newline), + => one or more
-    const tokens = text.split(/\s+/);
+    const tokens = trainingText.split(/\s+/);
     console.log("tokens length: " + tokens.length);
     for (const token of tokens) {
         console.log(token);
     }
     console.log("\n\n");
 
-    // get ngrams from tokens
+    const ngrams = buildModelFromTokens(tokens);
+    console.log("ngrams length: " + ngrams.length);
+    console.log(ngrams);
+
+    const generatedTokens = generateTokensFromModel(ngrams, ["In", "practice,"], 100);
+    console.log("generated tokens length: " + generatedTokens.length);
+    console.log(generatedTokens);
+    const generatedText = generatedTokens.join(" ");
+    console.log(generatedText);
+}
+
+function buildModelFromTokens(tokens) {
     const ngrams = [];
-    for (let i = 0; i <= tokens.length - order; i++) {
+    for (let i = 0; i < tokens.length - (order - 1); i++) {
         // get current ngram and split into history and follower
         const history = [];
         for (let j = 0; j < order - 1; j++) {
@@ -36,12 +47,7 @@ function runApp() {
         }
         const follower = tokens[i + order - 1];
         // find corresponding ngram to current history
-        let ngramIndex = -1;
-        for (let j = 0; j < ngrams.length; j++) {
-            if (arraysEqual(history, ngrams[j].history)) {
-                ngramIndex = j;
-            }
-        }
+        const ngramIndex = findNGramByHistory(ngrams, history);
         if (ngramIndex === -1) {
             // if ngram does not exist, create new ngram
             const ngram = {
@@ -54,9 +60,16 @@ function runApp() {
             ngrams[ngramIndex].followers.push(follower);
         }
     }
+    return ngrams;
+}
 
-    console.log("ngrams length: " + ngrams.length);
-    console.log(ngrams);
+function findNGramByHistory(ngrams, history) {
+    for (let j = 0; j < ngrams.length; j++) {
+        if (arraysEqual(history, ngrams[j].history)) {
+            return j;
+        }
+    }
+    return -1;
 }
 
 function arraysEqual(arr1, arr2) {
@@ -69,4 +82,33 @@ function arraysEqual(arr1, arr2) {
         }
     }
     return true;
+}
+
+function generateTokensFromModel(ngrams, startHistory, length) {
+    const tokens = [];
+
+    Array.prototype.push.apply(tokens, startHistory);
+
+    let currHistory = startHistory;
+
+    while (tokens.length < length) {
+        const ngramIndex = findNGramByHistory(ngrams, currHistory);
+        if (ngramIndex === -1) {
+            // ngram with current history not found
+            // may occur if start history is invalid,
+            // or if it current history appeared at the end of the training text
+            return tokens;
+        }
+
+        const ngram = ngrams[ngramIndex];
+        const followers = ngram.followers;
+        const followerIndex = Math.floor(Math.random() * followers.length);
+        const follower = followers[followerIndex];
+        tokens.push(follower);
+
+        // update history -> use last (order - 1) tokens
+        currHistory = tokens.slice(tokens.length - (order - 1), tokens.length);
+    }
+
+    return tokens;
 }
