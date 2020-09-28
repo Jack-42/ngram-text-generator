@@ -29,15 +29,44 @@ function runApp() {
     // get ngrams from tokens
     const ngrams = [];
     for (let i = 0; i <= tokens.length - order; i++) {
+        // get current ngram and split into history and follower
         const history = [];
         for (let j = 0; j < order - 1; j++) {
             history.push(tokens[i + j]);
         }
         const follower = tokens[i + order - 1];
-        const ngram = {history, follower};
-        ngrams.push(ngram);
+        // find corresponding ngram to current history
+        let ngramIndex = -1;
+        for (let j = 0; j < ngrams.length; j++) {
+            if (arraysEqual(history, ngrams[j].history)) {
+                ngramIndex = j;
+            }
+        }
+        if (ngramIndex === -1) {
+            // if ngram does not exist, create new ngram
+            const ngram = {
+                history: history,
+                followers: [follower]
+            };
+            ngrams.push(ngram);
+        } else {
+            // if ngram already exists, add follower
+            ngrams[ngramIndex].followers.push(follower);
+        }
     }
 
     console.log("ngrams length: " + ngrams.length);
     console.log(ngrams);
+}
+
+function arraysEqual(arr1, arr2) {
+    if (arr1.length !== arr2.length) {
+        return false;
+    }
+    for (let i = 0; i < arr1.length; i++) {
+        if (arr1[i] !== arr2[i]) {
+            return false;
+        }
+    }
+    return true;
 }
