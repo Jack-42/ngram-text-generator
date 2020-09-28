@@ -29,10 +29,12 @@ function runApp() {
     // get ngrams from tokens
     const ngrams = [];
     for (let i = 0; i <= tokens.length - order; i++) {
-        const ngram = [];
-        for (let j = 0; j < order; j++) {
-            ngram.push(tokens[i + j]);
+        const history = [];
+        for (let j = 0; j < order - 1; j++) {
+            history.push(tokens[i + j]);
         }
+        const follower = tokens[i + order - 1];
+        const ngram = {history, follower};
         ngrams.push(ngram);
     }
 
