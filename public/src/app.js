@@ -17,24 +17,17 @@ const trainingText = "n-gram models are widely used in statistical natural langu
 const order = 3;
 
 function runApp() {
-    // split text into tokens
-    // regex: \s => whitespace (including tab, newline), + => one or more
-    const tokens = trainingText.split(/\s+/);
-    console.log("tokens length: " + tokens.length);
-    for (const token of tokens) {
-        console.log(token);
-    }
-    console.log("\n\n");
-
+    const tokens = tokenize(trainingText);
     const ngrams = buildModelFromTokens(tokens);
-    console.log("ngrams length: " + ngrams.length);
-    console.log(ngrams);
-
     const generatedTokens = generateTokensFromModel(ngrams, ["In", "practice,"], 100);
-    console.log("generated tokens length: " + generatedTokens.length);
-    console.log(generatedTokens);
     const generatedText = generatedTokens.join(" ");
     console.log(generatedText);
+}
+
+function tokenize(text) {
+    // split text into tokens
+    // regex: \s => whitespace (including tab, newline), + => one or more
+    return trainingText.split(/\s+/);
 }
 
 function buildModelFromTokens(tokens) {
@@ -85,13 +78,12 @@ function arraysEqual(arr1, arr2) {
 }
 
 function generateTokensFromModel(ngrams, startHistory, length) {
-    const tokens = [];
-
-    Array.prototype.push.apply(tokens, startHistory);
+    const tokens = startHistory.slice(0); // copy
 
     let currHistory = startHistory;
 
     while (tokens.length < length) {
+        // find ngram starting with the current history
         const ngramIndex = findNGramByHistory(ngrams, currHistory);
         if (ngramIndex === -1) {
             // ngram with current history not found
@@ -99,8 +91,9 @@ function generateTokensFromModel(ngrams, startHistory, length) {
             // or if it current history appeared at the end of the training text
             return tokens;
         }
-
         const ngram = ngrams[ngramIndex];
+
+        // pick random follower and add it to the tokens
         const followers = ngram.followers;
         const followerIndex = Math.floor(Math.random() * followers.length);
         const follower = followers[followerIndex];
