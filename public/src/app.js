@@ -39,7 +39,7 @@ function generateText() {
         alert("You need to build the model first!");
         return;
     }
-    const generatedTokens = model.generateTokens(["All", "I"], 100);
+    const generatedTokens = model.generateTokens(["Yes", "I"], 100);
     const generatedText = generatedTokens.join(" ");
     document.getElementById("generated-text").innerText = generatedText;
 }
