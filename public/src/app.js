@@ -40,7 +40,7 @@ function generateText() {
     }
     const generatedTokens = generateTokensFromModel(model, ["All", "I"], 100);
     const generatedText = generatedTokens.join(" ");
-    console.log(generatedText);
+    document.getElementById("generated-text").innerText = generatedText;
 }
 
 function tokenize(text) {
