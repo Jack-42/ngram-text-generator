@@ -36,7 +36,7 @@ class NGramModel {
 
         while (tokens.length < length) {
             // find ngram starting with the current history
-            const ngramIndex = findNGramByHistory(currHistory);
+            const ngramIndex = this.findNGramByHistory(currHistory);
             if (ngramIndex === -1) {
                 // ngram with current history not found
                 // may occur if current history appeared at the end of the training text
