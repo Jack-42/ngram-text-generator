@@ -14,7 +14,7 @@ const trainingText = "n-gram models are widely used in statistical natural langu
     "\n" +
     "Handcrafted features of various sorts are also used, for example variables that represent the position of a word in a sentence or the general topic of discourse. In addition, features based on the structure of the potential result, such as syntactic considerations, are often used. Such features are also used as part of the likelihood function, which makes use of the observed data. Conventional linguistic theory can be incorporated in these features (although in practice, it is rare that features specific to generative or other particular theories of grammar are incorporated, as computational linguists tend to be \"agnostic\" towards individual theories of grammar[citation needed]). ";
 
-const order = 3;
+const ORDER = 3;
 let model;
 
 function buildModel() {
@@ -27,7 +27,8 @@ function buildModel() {
     reader.onload = () => {
         const text = reader.result;
         const tokens = tokenize(text);
-        model = buildModelFromTokens(tokens);
+        model = new NGramModel(ORDER);
+        model.buildModelFromTokens(tokens);
         console.log(model);
     }
     reader.readAsText(files[0]);
@@ -38,7 +39,7 @@ function generateText() {
         alert("You need to build the model first!");
         return;
     }
-    const generatedTokens = generateTokensFromModel(model, ["All", "I"], 100);
+    const generatedTokens = model.generateTokens(["All", "I"], 100);
     const generatedText = generatedTokens.join(" ");
     document.getElementById("generated-text").innerText = generatedText;
 }
@@ -47,80 +48,4 @@ function tokenize(text) {
     // split text into tokens
     // regex: \s => whitespace (including tab, newline), + => one or more
     return text.split(/\s+/);
-}
-
-function buildModelFromTokens(tokens) {
-    const ngrams = [];
-    for (let i = 0; i < tokens.length - (order - 1); i++) {
-        // get current ngram and split into history and follower
-        const history = [];
-        for (let j = 0; j < order - 1; j++) {
-            history.push(tokens[i + j]);
-        }
-        const follower = tokens[i + order - 1];
-        // find corresponding ngram to current history
-        const ngramIndex = findNGramByHistory(ngrams, history);
-        if (ngramIndex === -1) {
-            // if ngram does not exist, create new ngram
-            const ngram = {
-                history: history,
-                followers: [follower]
-            };
-            ngrams.push(ngram);
-        } else {
-            // if ngram already exists, add follower
-            ngrams[ngramIndex].followers.push(follower);
-        }
-    }
-    return ngrams;
-}
-
-function findNGramByHistory(ngrams, history) {
-    for (let j = 0; j < ngrams.length; j++) {
-        if (arraysEqual(history, ngrams[j].history)) {
-            return j;
-        }
-    }
-    return -1;
-}
-
-function arraysEqual(arr1, arr2) {
-    if (arr1.length !== arr2.length) {
-        return false;
-    }
-    for (let i = 0; i < arr1.length; i++) {
-        if (arr1[i] !== arr2[i]) {
-            return false;
-        }
-    }
-    return true;
-}
-
-function generateTokensFromModel(ngrams, startHistory, length) {
-    const tokens = startHistory.slice(0); // copy
-
-    let currHistory = startHistory;
-
-    while (tokens.length < length) {
-        // find ngram starting with the current history
-        const ngramIndex = findNGramByHistory(ngrams, currHistory);
-        if (ngramIndex === -1) {
-            // ngram with current history not found
-            // may occur if start history is invalid,
-            // or if it current history appeared at the end of the training text
-            return tokens;
-        }
-        const ngram = ngrams[ngramIndex];
-
-        // pick random follower and add it to the tokens
-        const followers = ngram.followers;
-        const followerIndex = Math.floor(Math.random() * followers.length);
-        const follower = followers[followerIndex];
-        tokens.push(follower);
-
-        // update history -> use last (order - 1) tokens
-        currHistory = tokens.slice(tokens.length - (order - 1), tokens.length);
-    }
-
-    return tokens;
 }
