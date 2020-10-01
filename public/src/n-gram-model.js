@@ -6,6 +6,7 @@ class NGramModel {
 
     buildModelFromTokens(tokens) {
         this.ngrams = [];
+
         for (let i = 0; i < tokens.length - (this.order - 1); i++) {
             // get current ngram and split into history and follower
             const history = [];
@@ -13,7 +14,8 @@ class NGramModel {
                 history.push(tokens[i + j]);
             }
             const follower = tokens[i + this.order - 1];
-            // find corresponding ngram to current history
+
+            // find corresponding ngram for current history
             const ngramIndex = this.findNGramByHistory(history);
             if (ngramIndex === -1) {
                 // if ngram does not exist, create new ngram
