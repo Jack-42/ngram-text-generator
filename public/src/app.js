@@ -1,6 +1,9 @@
 const ORDER = 3;
 let model;
 
+let startTime;
+let elapsedTime;
+
 function buildModel() {
     const files = document.getElementById("training-text-file").files;
     if (files.length === 0) {
@@ -10,13 +13,16 @@ function buildModel() {
     const reader = new FileReader();
     reader.onload = () => {
         const text = reader.result;
+        startTime = performance.now();
         const tokens = tokenize(text);
+        elapsedTime = performance.now() - startTime;
+        console.log("Pre-processing: " + elapsedTime + " ms");
         console.log("Training text tokens length: " + tokens.length);
         model = new NGramModel(ORDER);
-        const startTime = performance.now();
+        startTime = performance.now();
         model.buildModelFromTokens(tokens);
-        const elapsedTime = performance.now() - startTime;
-        console.log("Required " + elapsedTime + " ms to build model.");
+        elapsedTime = performance.now() - startTime;
+        console.log("Build model: " + elapsedTime + " ms");
     }
     reader.readAsText(files[0]);
 }
@@ -40,12 +46,15 @@ function generateText() {
         return;
     }
 
-    const startTime = performance.now();
+    startTime = performance.now();
     const generatedTokens = model.generateTokens(startHistory, length);
-    const elapsedTime = performance.now() - startTime;
-    console.log("Required " + elapsedTime + " ms to generate tokens.");
+    elapsedTime = performance.now() - startTime;
+    console.log("Generate tokens: " + elapsedTime + " ms");
     console.log("Generated tokens length: " + generatedTokens.length);
+    startTime = performance.now();
     const generatedText = generatedTokens.join(" ");
+    elapsedTime = performance.now () - startTime;
+    console.log("Post-processing: " + elapsedTime + " ms");
     document.getElementById("generated-text").innerText = generatedText;
 }
 
