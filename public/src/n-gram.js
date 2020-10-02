@@ -48,8 +48,12 @@ class NGram {
             totalPredictionCount += prediction.frequency;
         }
 
+        let probabilityThreshold = 0.0;
         for (const prediction of this.predictions) {
-            prediction.probability = prediction.frequency / totalPredictionCount;
+            const probability = prediction.frequency / totalPredictionCount;
+            probabilityThreshold += probability;
+            prediction.probability = probability;
+            prediction.probabilityThreshold = probabilityThreshold;
         }
     }
 }
