@@ -4,8 +4,18 @@ class NGram {
         this.predictions = [];
     }
 
-    addPrediction(prediction) {
-        this.predictions.push(prediction);
+    addPrediction(token) {
+        // find corresponding prediction for given token
+        const predictionIndex = this.findPredictionByToken(token);
+        if (predictionIndex !== -1) {
+            // prediction exists, so increase frequency
+            const prediction = this.predictions[predictionIndex];
+            prediction.incrementFrequency();
+        } else {
+            // prediction does not exist, so create new one
+            const prediction = new NGramPrediction(token);
+            this.predictions.push(prediction);
+        }
     }
 
     getRandomPrediction() {
@@ -23,5 +33,14 @@ class NGram {
             }
         }
         return true;
+    }
+
+    findPredictionByToken(token) {
+        for (let i = 0; i < this.predictions.length; i++) {
+            if (this.predictions[i].matchesToken(token)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }

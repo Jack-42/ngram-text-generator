@@ -16,8 +16,8 @@ class NGramModel {
             const prediction = tokens[i + this.order - 1];
 
             // find corresponding ngram for current history
-            const ngramIndex = this.findNGramByHistory(history);
             let ngram;
+            const ngramIndex = this.findNGramByHistory(history);
             if (ngramIndex !== -1) {
                 ngram = this.ngrams[ngramIndex];
             } else {
@@ -40,7 +40,7 @@ class NGramModel {
             const ngramIndex = this.findNGramByHistory(currHistory);
             if (ngramIndex === -1) {
                 // ngram with current history not found
-                // may occur if current history appeared at the end of the training text
+                // may occur if current history only appeared at the end of the training text
                 // or if start history did not appear at all
                 return tokens;
             }
