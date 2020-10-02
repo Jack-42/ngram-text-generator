@@ -15,18 +15,15 @@ class NGramModel {
             }
             const prediction = tokens[i + this.order - 1];
 
-            // find corresponding ngram for current history
-            let ngram;
+            // find corresponding ngram for current history, create if it does not exist
             const ngramIndex = this.findNGramByHistory(history);
-            if (ngramIndex !== -1) {
-                ngram = this.ngrams[ngramIndex];
-            } else {
-                // if ngram does not exist, create new ngram
-                ngram = new NGram(history);
+            if (ngramIndex === -1) {
+                const ngram = new NGram(history, prediction);
                 this.ngrams.push(ngram);
+            } else {
+                const ngram = this.ngrams[ngramIndex];
+                ngram.addPrediction(prediction);
             }
-            // in both cases, add prediction to ngram
-            ngram.addPrediction(prediction);
         }
     }
 
