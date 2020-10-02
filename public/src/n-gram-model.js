@@ -17,17 +17,16 @@ class NGramModel {
 
             // find corresponding ngram for current history
             const ngramIndex = this.findNGramByHistory(history);
-            if (ngramIndex === -1) {
-                // if ngram does not exist, create new ngram
-                const ngram = {
-                    history: history,
-                    predictions: [prediction]
-                };
-                this.ngrams.push(ngram);
+            let ngram;
+            if (ngramIndex !== -1) {
+                ngram = this.ngrams[ngramIndex];
             } else {
-                // if ngram already exists, add prediction
-                this.ngrams[ngramIndex].predictions.push(prediction);
+                // if ngram does not exist, create new ngram
+                ngram = new NGram(history);
+                this.ngrams.push(ngram);
             }
+            // in both cases, add prediction to ngram
+            ngram.addPrediction(prediction);
         }
     }
 
@@ -47,10 +46,8 @@ class NGramModel {
             }
             const ngram = this.ngrams[ngramIndex];
 
-            // pick random prediction and add it to the tokens
-            const predictions = ngram.predictions;
-            const predictionIndex = Math.floor(Math.random() * predictions.length);
-            const prediction = predictions[predictionIndex];
+            // add random prediction to tokens
+            const prediction = ngram.getRandomPrediction();
             tokens.push(prediction);
 
             // update history -> use last (order - 1) tokens
@@ -61,23 +58,11 @@ class NGramModel {
     }
 
     findNGramByHistory(history) {
-        for (let j = 0; j < this.ngrams.length; j++) {
-            if (this.arraysEqual(this.ngrams[j].history, history)) {
-                return j;
+        for (let i = 0; i < this.ngrams.length; i++) {
+            if (this.ngrams[i].matchesHistory(history)) {
+                return i;
             }
         }
         return -1;
-    }
-
-    arraysEqual(arr1, arr2) {
-        if (arr1.length !== arr2.length) {
-            return false;
-        }
-        for (let i = 0; i < arr1.length; i++) {
-            if (arr1[i] !== arr2[i]) {
-                return false;
-            }
-        }
-        return true;
     }
 }
