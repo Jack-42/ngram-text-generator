@@ -2,6 +2,7 @@ class NGramPrediction {
     constructor(token) {
         this.token = token;
         this.frequency = 1;
+        this.probability = 0.0;
     }
 
     matchesToken(token) {

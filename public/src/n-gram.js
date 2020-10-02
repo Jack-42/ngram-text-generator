@@ -41,4 +41,15 @@ class NGram {
         }
         return -1;
     }
+
+    calculateProbabilities() {
+        let totalPredictionCount = 0;
+        for (const prediction of this.predictions) {
+            totalPredictionCount += prediction.frequency;
+        }
+
+        for (const prediction of this.predictions) {
+            prediction.probability = prediction.frequency / totalPredictionCount;
+        }
+    }
 }

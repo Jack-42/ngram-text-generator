@@ -25,6 +25,10 @@ class NGramModel {
                 ngram.addPrediction(prediction);
             }
         }
+
+        for (const ngram of this.ngrams) {
+            ngram.calculateProbabilities();
+        }
     }
 
     generateTokens(startHistory, length) {
