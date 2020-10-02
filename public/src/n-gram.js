@@ -17,8 +17,12 @@ class NGram {
     }
 
     getRandomPrediction() {
-        const index = Math.floor(Math.random() * this.predictions.length);
-        return this.predictions[index];
+        const random = Math.random();
+        for (const prediction of this.predictions) {
+            if (random < prediction.probabilityThreshold) {
+                return prediction.token;
+            }
+        }
     }
 
     matchesHistory(history) {
