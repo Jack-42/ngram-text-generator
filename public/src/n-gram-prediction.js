@@ -3,6 +3,7 @@ class NGramPrediction {
         this.token = token;
         this.frequency = 1;
         this.probability = 0.0;
+        this.probabilityOffset = 0.0;
     }
 
     matchesToken(token) {
