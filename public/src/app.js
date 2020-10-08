@@ -14,7 +14,7 @@ function buildModel() {
     reader.onload = () => {
         const text = reader.result;
         startTime = performance.now();
-        const tokens = tokenize(text);
+        const tokens = preProcessText(text);
         elapsedTime = performance.now() - startTime;
         console.log("Pre-processing: " + elapsedTime + " ms");
         console.log("Training text tokens length: " + tokens.length);
@@ -25,6 +25,26 @@ function buildModel() {
         console.log("Build model: " + elapsedTime + " ms");
     }
     reader.readAsText(files[0]);
+}
+
+function preProcessText(text) {
+    const tokens = tokenize(text);
+    const dictionary = buildDictionary(tokens);
+    console.log("dictionary", dictionary);
+    return tokens;
+}
+
+function tokenize(text) {
+    // regex: \s => whitespace (including tab, newline), + => one or more
+    return text.split(/\s+/);
+}
+
+function buildDictionary(tokens) {
+    const dictionary = new Dictionary();
+    for (const token of tokens) {
+        dictionary.addToken(token);
+    }
+    return dictionary;
 }
 
 function generateText() {
@@ -56,10 +76,4 @@ function generateText() {
     elapsedTime = performance.now () - startTime;
     console.log("Post-processing: " + elapsedTime + " ms");
     document.getElementById("generated-text").innerText = generatedText;
-}
-
-function tokenize(text) {
-    // split text into tokens
-    // regex: \s => whitespace (including tab, newline), + => one or more
-    return text.split(/\s+/);
 }
