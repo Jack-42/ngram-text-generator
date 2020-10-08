@@ -1,4 +1,6 @@
 const ORDER = 3;
+
+let dictionary;
 let model;
 
 let startTime;
@@ -29,11 +31,14 @@ function buildModel() {
 
 function preProcessText(text) {
     const tokens = tokenize(text);
-    const dictionary = buildDictionary(tokens);
+    dictionary = new Dictionary();
+    for (const token of tokens) {
+        dictionary.addToken(token);
+    }
     console.log("dictionary", dictionary);
-    const tokensAsNumbers = convertTokensToNumbers(tokens, dictionary);
+    const tokensAsNumbers = convertTokensToNumbers(tokens);
     console.log("tokensAsNumbers", tokensAsNumbers);
-    return tokens;
+    return tokensAsNumbers;
 }
 
 function tokenize(text) {
@@ -41,15 +46,7 @@ function tokenize(text) {
     return text.split(/\s+/);
 }
 
-function buildDictionary(tokens) {
-    const dictionary = new Dictionary();
-    for (const token of tokens) {
-        dictionary.addToken(token);
-    }
-    return dictionary;
-}
-
-function convertTokensToNumbers(tokens, dictionary) {
+function convertTokensToNumbers(tokens) {
     const numbers = new Array(tokens.length);
     for (let i = 0; i < tokens.length; i++) {
         numbers[i] = dictionary.getIDOfToken(tokens[i]);
@@ -77,7 +74,8 @@ function generateText() {
     }
 
     startTime = performance.now();
-    const generatedTokens = model.generateTokens(startHistory, length);
+    const startHistoryAsNumbers = convertTokensToNumbers(startHistory);
+    const generatedTokens = model.generateTokens(startHistoryAsNumbers, length);
     elapsedTime = performance.now() - startTime;
     console.log("Generate tokens: " + elapsedTime + " ms");
     console.log("Generated tokens length: " + generatedTokens.length);
