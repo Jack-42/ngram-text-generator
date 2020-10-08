@@ -1,4 +1,5 @@
 const ORDER = 3;
+const SPECIAL_CHARS = [".", "?", "!", ",", ";", ":", "(", ")", "[", "]", "{", "}", "\"", "\n", "\r"];
 
 let dictionary;
 let model;
@@ -31,6 +32,7 @@ function buildModel() {
 
 function preProcessText(text) {
     const tokens = tokenize(text);
+    console.log(tokens);
     dictionary = new Dictionary();
     for (const token of tokens) {
         dictionary.addToken(token);
@@ -39,14 +41,7 @@ function preProcessText(text) {
 }
 
 function tokenize(text) {
-    // regex: \s => whitespace (including tab, newline), + => one or more
-    return text.split(/\s+/);
-}
-
-// TODO: Clean up
-function newTokenize(text) {
     const tokens = [];
-    const specialChars = ["\n", ".", "?", "!", ",", ";", ":", "\"", "'"]; // TODO: as global constant
     let current = 0;
     let tokenStart = 0;
     while (current < text.length) {
@@ -59,7 +54,7 @@ function newTokenize(text) {
             }
             current++;
             tokenStart = current;
-        } else if (specialChars.includes(text[current])) {
+        } else if (SPECIAL_CHARS.includes(text[current])) {
             // found special char
             // take string before special char as token (only if not empty)
             if (tokenStart < current) {
