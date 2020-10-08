@@ -62,6 +62,11 @@ function tokenize(text) {
             current++;
         }
     }
+    // add the remaining part as last token (only if not empty)
+    if (tokenStart < text.length) {
+        const token = text.substring(tokenStart, text.length);
+        tokens.push(token);
+    }
     return tokens;
 }
 
@@ -81,8 +86,9 @@ function generateText() {
 
     const startText = document.getElementById("start-text").value;
     const startHistory = tokenize(startText);
-    if (startHistory.length !== 2) {
-        alert("You need to specify a start text of exactly 2 words!");
+    console.log(startHistory);
+    if (startHistory.length !== 5) {
+        alert("You need to specify a start text of exactly 5 tokens (space and punctuation count separately!");
         return;
     }
 
@@ -111,5 +117,5 @@ function postProcessTokens(tokensAsNumbers) {
     for (let i = 0; i < tokens.length; i++) {
         tokens[i] = dictionary.getTokenByID(tokensAsNumbers[i]);
     }
-    return tokens.join(" ");
+    return tokens.join("");
 }
