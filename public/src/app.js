@@ -52,30 +52,34 @@ function newTokenize(text) {
     while (current < text.length) {
         console.log("text[" + current + "]:" + text[current]);
         if (text[current] === " ") {
+            console.log("SPACE");
             // found space
-            // take string before the space as token
-            const token = text.substring(tokenStart, current);
-            tokens.push(token);
+            // take string before space as token (only if not empty)
+            if (tokenStart < current) {
+                const token = text.substring(tokenStart, current);
+                tokens.push(token);
+                console.log("token: " + token);
+            }
             current++;
             tokenStart = current;
             const rest = text.substring(tokenStart);
-            console.log("SPACE");
-            console.log("token: " + token);
             console.log("rest: " + rest);
         } else if (specialChars.includes(text[current])) {
+            console.log("SPECIAL");
             // found special char
-            // take string before special char as token
-            const token = text.substring(tokenStart, current);
-            tokens.push(token);
+            // take string before special char as token (only if not empty)
+            if (tokenStart < current) {
+                const token = text.substring(tokenStart, current);
+                tokens.push(token);
+                console.log("token: " + token);
+            }
             // add special char as separate token
             const specialChar = text[current];
             tokens.push(specialChar);
+            console.log("special char: " + specialChar);
             current++;
             tokenStart = current;
             const rest = text.substring(tokenStart);
-            console.log("SPECIAL");
-            console.log("token: " + token);
-            console.log("special char: " + specialChar);
             console.log("rest: " + rest);
         } else {
             // found nothing, just go to next char
