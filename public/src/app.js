@@ -35,10 +35,7 @@ function preProcessText(text) {
     for (const token of tokens) {
         dictionary.addToken(token);
     }
-    console.log("dictionary", dictionary);
-    const tokensAsNumbers = convertTokensToNumbers(tokens);
-    console.log("tokensAsNumbers", tokensAsNumbers);
-    return tokensAsNumbers;
+    return convertTokensToNumbers(tokens);
 }
 
 function tokenize(text) {
