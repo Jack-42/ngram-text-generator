@@ -45,38 +45,44 @@ function tokenize(text) {
 
 // TODO: Clean up
 function newTokenize(text) {
-    const specialChars = ["\n", ".", ",", ";", ":", "?", "!"];
-    let startIndex = 0;
-    let index = 0;
-    while (index < text.length) {
-        console.log("text[" + index + "]:" + text[index]);
-        if (text[index] === " ") {
+    const tokens = [];
+    const specialChars = ["\n", ".", "?", "!", ",", ";", ":", "\"", "'"]; // TODO: as global constant
+    let current = 0;
+    let tokenStart = 0;
+    while (current < text.length) {
+        console.log("text[" + current + "]:" + text[current]);
+        if (text[current] === " ") {
             // found space
-            // -> take string before the space as new token
-            const token = text.substring(startIndex, index);
-            // TODO: add token to tokens
-            index++;
-            startIndex = index;
-            const rest = text.substring(startIndex);
+            // take string before the space as token
+            const token = text.substring(tokenStart, current);
+            tokens.push(token);
+            current++;
+            tokenStart = current;
+            const rest = text.substring(tokenStart);
             console.log("SPACE");
             console.log("token: " + token);
             console.log("rest: " + rest);
-        } else if (specialChars.includes(text[index])) {
+        } else if (specialChars.includes(text[current])) {
             // found special char
-            const tokenBefore = text.substring(startIndex, index);
-            const specialChar = text[index];
-            // TODO: add special char to tokens
-            index++;
-            startIndex = index;
-            const rest = text.substring(startIndex);
+            // take string before special char as token
+            const token = text.substring(tokenStart, current);
+            tokens.push(token);
+            // add special char as separate token
+            const specialChar = text[current];
+            tokens.push(specialChar);
+            current++;
+            tokenStart = current;
+            const rest = text.substring(tokenStart);
             console.log("SPECIAL");
-            console.log("token before: " + tokenBefore);
+            console.log("token: " + token);
             console.log("special char: " + specialChar);
             console.log("rest: " + rest);
         } else {
-            index++;
+            // found nothing, just go to next char
+            current++;
         }
     }
+    return tokens;
 }
 
 function convertTokensToNumbers(tokens) {
