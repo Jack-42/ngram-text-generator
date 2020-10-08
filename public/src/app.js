@@ -51,16 +51,28 @@ function newTokenize(text) {
     while (index < text.length) {
         console.log("text[" + index + "]:" + text[index]);
         if (text[index] === " ") {
-            const token = text.substring(startIndex, index); // token before space
-            index++; // skip space
+            // found space
+            // -> take string before the space as new token
+            const token = text.substring(startIndex, index);
+            // TODO: add token to tokens
+            index++;
             startIndex = index;
-            const rest = text.substring(startIndex); // rest after the space
+            const rest = text.substring(startIndex);
             console.log("SPACE");
             console.log("token: " + token);
             console.log("rest: " + rest);
         } else if (specialChars.includes(text[index])) {
-            console.log("SPECIAL: " + text[index]);
+            // found special char
+            const tokenBefore = text.substring(startIndex, index);
+            const specialChar = text[index];
+            // TODO: add special char to tokens
             index++;
+            startIndex = index;
+            const rest = text.substring(startIndex);
+            console.log("SPECIAL");
+            console.log("token before: " + tokenBefore);
+            console.log("special char: " + specialChar);
+            console.log("rest: " + rest);
         } else {
             index++;
         }
