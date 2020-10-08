@@ -31,6 +31,8 @@ function preProcessText(text) {
     const tokens = tokenize(text);
     const dictionary = buildDictionary(tokens);
     console.log("dictionary", dictionary);
+    const tokensAsNumbers = convertTokensToNumbers(tokens, dictionary);
+    console.log("tokensAsNumbers", tokensAsNumbers);
     return tokens;
 }
 
@@ -45,6 +47,14 @@ function buildDictionary(tokens) {
         dictionary.addToken(token);
     }
     return dictionary;
+}
+
+function convertTokensToNumbers(tokens, dictionary) {
+    const numbers = new Array(tokens.length);
+    for (let i = 0; i < tokens.length; i++) {
+        numbers[i] = dictionary.getIDOfToken(tokens[i]);
+    }
+    return numbers;
 }
 
 function generateText() {
