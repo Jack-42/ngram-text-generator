@@ -48,7 +48,7 @@ function tokenize(text) {
 
 function convertTokensToNumbers(tokens) {
     const numbers = new Array(tokens.length);
-    for (let i = 0; i < tokens.length; i++) {
+    for (let i = 0; i < numbers.length; i++) {
         numbers[i] = dictionary.getIDOfToken(tokens[i]);
     }
     return numbers;
@@ -73,15 +73,24 @@ function generateText() {
         return;
     }
 
-    startTime = performance.now();
     const startHistoryAsNumbers = convertTokensToNumbers(startHistory);
-    const generatedTokens = model.generateTokens(startHistoryAsNumbers, length);
+
+    startTime = performance.now();
+    const tokens = model.generateTokens(startHistoryAsNumbers, length);
     elapsedTime = performance.now() - startTime;
     console.log("Generate tokens: " + elapsedTime + " ms");
-    console.log("Generated tokens length: " + generatedTokens.length);
+    console.log("Generated tokens length: " + tokens.length);
     startTime = performance.now();
-    const generatedText = generatedTokens.join(" ");
+    const text = postProcessTokens(tokens);
     elapsedTime = performance.now () - startTime;
     console.log("Post-processing: " + elapsedTime + " ms");
-    document.getElementById("generated-text").innerText = generatedText;
+    document.getElementById("generated-text").innerText = text;
+}
+
+function postProcessTokens(tokensAsNumbers) {
+    const tokens = new Array(tokensAsNumbers.length);
+    for (let i = 0; i < tokens.length; i++) {
+        tokens[i] = dictionary.getTokenByID(tokensAsNumbers[i]);
+    }
+    return tokens.join(" ");
 }
