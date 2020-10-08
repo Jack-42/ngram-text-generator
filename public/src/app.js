@@ -43,6 +43,30 @@ function tokenize(text) {
     return text.split(/\s+/);
 }
 
+// TODO: Clean up
+function newTokenize(text) {
+    const specialChars = ["\n", ".", ",", ";", ":", "?", "!"];
+    let startIndex = 0;
+    let index = 0;
+    while (index < text.length) {
+        console.log("text[" + index + "]:" + text[index]);
+        if (text[index] === " ") {
+            const token = text.substring(startIndex, index); // token before space
+            index++; // skip space
+            startIndex = index;
+            const rest = text.substring(startIndex); // rest after the space
+            console.log("SPACE");
+            console.log("token: " + token);
+            console.log("rest: " + rest);
+        } else if (specialChars.includes(text[index])) {
+            console.log("SPECIAL: " + text[index]);
+            index++;
+        } else {
+            index++;
+        }
+    }
+}
+
 function convertTokensToNumbers(tokens) {
     const numbers = new Array(tokens.length);
     for (let i = 0; i < numbers.length; i++) {
