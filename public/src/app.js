@@ -1,5 +1,5 @@
-const ORDER = 6;
-const SEPARATOR_TOKENS = [" ", ".", "?", "!", ",", ";", ":", "(", ")", "[", "]", "{", "}", "\"", "\n", "\r"];
+const ORDER = 3;
+const SPECIAL_CHARS = [".", "?", "!", ",", ";", ":", "(", ")", "[", "]", "{", "}", "\"", "\n", "\r"];
 
 let dictionary;
 let model;
@@ -45,16 +45,25 @@ function tokenize(text) {
     let current = 0;
     let tokenStart = 0;
     while (current < text.length) {
-        if (SEPARATOR_TOKENS.includes(text[current])) {
-            // found separator token
-            // add string before separator as token (only if not empty)
+        if (text[current] === " ") {
+            // found space
+            // take string before space as token (only if not empty)
             if (tokenStart < current) {
                 const token = text.substring(tokenStart, current);
                 tokens.push(token);
             }
-            // add separator as token
-            const separator = text[current];
-            tokens.push(separator);
+            current++;
+            tokenStart = current;
+        } else if (SPECIAL_CHARS.includes(text[current])) {
+            // found special char
+            // take string before special char as token (only if not empty)
+            if (tokenStart < current) {
+                const token = text.substring(tokenStart, current);
+                tokens.push(token);
+            }
+            // add special char as separate token
+            const specialChar = text[current];
+            tokens.push(specialChar);
             current++;
             tokenStart = current;
         } else {
