@@ -103,7 +103,8 @@ function generateText() {
     const startText = document.getElementById("start-text").value;
     const startHistory = tokenize(startText);
     if (startHistory.length !== 2) {
-        alert("You need to specify a start text of exactly 2 tokens (punctuation / special chars count separately!");
+        alert("You need to specify a start text of exactly 2 tokens!\n" +
+            "Punctuation / special characters count separately.");
         return;
     }
 
