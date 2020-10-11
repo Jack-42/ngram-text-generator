@@ -9,8 +9,9 @@ const SPECIAL_CHARS_WITHOUT_SEPARATION = [".", "?", "!", ",", ";", ":", ")", "]"
 // all special chars, no distinction necessary for building the model
 const SPECIAL_CHARS = SPECIAL_CHARS_WITH_SEPARATION.concat(SPECIAL_CHARS_WITHOUT_SEPARATION)
 
-let dictionary;
 let model;
+let dictionary;
+let buildModelFinished = false;
 
 let startTime;
 let elapsedTime;
@@ -22,20 +23,25 @@ function buildModel() {
         return;
     }
     const reader = new FileReader();
-    reader.onload = () => {
-        const text = reader.result;
-        startTime = performance.now();
-        const tokens = preProcessText(text);
-        elapsedTime = performance.now() - startTime;
-        console.log("Pre-processing: " + elapsedTime + " ms");
-        console.log("Training text tokens length: " + tokens.length);
-        model = new NGramModel(ORDER);
-        startTime = performance.now();
-        model.buildModelFromTokens(tokens);
-        elapsedTime = performance.now() - startTime;
-        console.log("Build model: " + elapsedTime + " ms");
+    reader.onload = async() => {
+        buildModelFinished = false;
+        await buildModelFromTextAsync(reader.result);
+        buildModelFinished = true;
     }
     reader.readAsText(files[0]);
+}
+
+async function buildModelFromTextAsync(text) {
+    startTime = performance.now();
+    const tokens = preProcessText(text);
+    elapsedTime = performance.now() - startTime;
+    console.log("Pre-processing: " + elapsedTime + " ms");
+    console.log("Training text tokens length: " + tokens.length);
+    model = new NGramModel(ORDER);
+    startTime = performance.now();
+    model.buildModelFromTokens(tokens);
+    elapsedTime = performance.now() - startTime;
+    console.log("Build model: " + elapsedTime + " ms");
 }
 
 function preProcessText(text) {
@@ -105,7 +111,7 @@ function convertTokensFromStringToID(tokens) {
 }
 
 function generateText() {
-    if (!model) {
+    if (!buildModelFinished) {
         alert("You need to build the model first!");
         return;
     }
