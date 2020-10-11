@@ -95,9 +95,8 @@ function generateText() {
 
     const startText = document.getElementById("start-text").value;
     const startHistory = tokenize(startText);
-    console.log(startHistory);
-    if (startHistory.length !== 5) {
-        alert("You need to specify a start text of exactly 5 tokens (space and punctuation count separately!");
+    if (startHistory.length !== 2) {
+        alert("You need to specify a start text of exactly 2 tokens (punctuation / special chars count separately!");
         return;
     }
 
@@ -126,5 +125,5 @@ function postProcessTokens(tokensAsNumbers) {
     for (let i = 0; i < tokens.length; i++) {
         tokens[i] = dictionary.getTokenByID(tokensAsNumbers[i]);
     }
-    return tokens.join("");
+    return tokens.join(" ");
 }
