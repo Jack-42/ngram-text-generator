@@ -150,17 +150,21 @@ function concatenateTokens(tokens) {
 
     // concatenate all tokens except first one
     for (let i = 1; i < tokens.length; i++) {
-        const token = tokens[i];
-        if (SPECIAL_CHARS_WITHOUT_SEPARATION.includes(token)) {
+        const currToken = tokens[i];
+        const prevToken = tokens[i - 1];
+        if (SPECIAL_CHARS_WITHOUT_SEPARATION.includes(currToken)) {
             // concatenate token without any separation
-            text += token; // += is efficient for concatenation
+            text += currToken; // += is efficient for concatenation
         } else {
             // both cases: special chars with separation and normal words
             // concatenate token with separation by space
-            text += " ";
-            text += token;
+            // but only if previous token was not a special char with separation
+            // example: "bla (hello)". should separate "(" by space, but not "hello"
+            if (!SPECIAL_CHARS_WITH_SEPARATION.includes(prevToken)) {
+                text += " ";
+            }
+            text += currToken;
         }
-        // TODO: small change: AFTER special chars with separation should NOT do separation
     }
 
     return text;
