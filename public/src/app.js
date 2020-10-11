@@ -23,25 +23,32 @@ function buildModel() {
         return;
     }
     const reader = new FileReader();
-    reader.onload = async() => {
-        buildModelFinished = false;
-        await buildModelFromTextAsync(reader.result);
+    reader.onload = () => {
+        // setTimeout to make function non-blocking
+        setTimeout(() => {
+            buildModelFromText(reader.result);
+        }, 0);
         buildModelFinished = true;
     }
     reader.readAsText(files[0]);
 }
 
-async function buildModelFromTextAsync(text) {
+function buildModelFromText(text) {
+    buildModelFinished = false;
+
     startTime = performance.now();
     const tokens = preProcessText(text);
     elapsedTime = performance.now() - startTime;
     console.log("Pre-processing: " + elapsedTime + " ms");
     console.log("Training text tokens length: " + tokens.length);
+
     model = new NGramModel(ORDER);
     startTime = performance.now();
     model.buildModelFromTokens(tokens);
     elapsedTime = performance.now() - startTime;
     console.log("Build model: " + elapsedTime + " ms");
+
+    buildModelFinished = true;
 }
 
 function preProcessText(text) {
