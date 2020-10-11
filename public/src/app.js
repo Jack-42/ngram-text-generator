@@ -1,5 +1,13 @@
 const ORDER = 3;
-const SPECIAL_CHARS = [".", "?", "!", ",", ";", ":", "(", ")", "[", "]", "{", "}", "\"", "\n", "\r"];
+
+// special chars which are concatenated to the previous with a separation by space
+const SPECIAL_CHARS_WITH_SEPARATION = ["(", "[", "{", "\""];
+
+// special chars which are directly concatenated to the previous token without any separation
+const SPECIAL_CHARS_WITHOUT_SEPARATION = [".", "?", "!", ",", ";", ":", ")", "]", "}", "\n", "\r"];
+
+// all special chars, no distinction necessary for building the model
+const SPECIAL_CHARS = SPECIAL_CHARS_WITH_SEPARATION.concat(SPECIAL_CHARS_WITHOUT_SEPARATION)
 
 let dictionary;
 let model;
@@ -32,12 +40,11 @@ function buildModel() {
 
 function preProcessText(text) {
     const tokens = tokenize(text);
-    console.log(tokens);
     dictionary = new Dictionary();
     for (const token of tokens) {
         dictionary.addToken(token);
     }
-    return convertTokensToNumbers(tokens);
+    return convertTokensFromStringToID(tokens);
 }
 
 function tokenize(text) {
@@ -79,7 +86,7 @@ function tokenize(text) {
     return tokens;
 }
 
-function convertTokensToNumbers(tokens) {
+function convertTokensFromStringToID(tokens) {
     const numbers = new Array(tokens.length);
     for (let i = 0; i < numbers.length; i++) {
         numbers[i] = dictionary.getIDOfToken(tokens[i]);
@@ -106,24 +113,55 @@ function generateText() {
         return;
     }
 
-    const startHistoryAsNumbers = convertTokensToNumbers(startHistory);
+    const startHistoryAsIDs = convertTokensFromStringToID(startHistory);
 
     startTime = performance.now();
-    const tokens = model.generateTokens(startHistoryAsNumbers, length);
+    const tokensAsIDs = model.generateTokens(startHistoryAsIDs, length);
     elapsedTime = performance.now() - startTime;
     console.log("Generate tokens: " + elapsedTime + " ms");
-    console.log("Generated tokens length: " + tokens.length);
+    console.log("Generated tokens length: " + tokensAsIDs.length);
     startTime = performance.now();
-    const text = postProcessTokens(tokens);
+    const text = postProcessTokens(tokensAsIDs);
     elapsedTime = performance.now () - startTime;
     console.log("Post-processing: " + elapsedTime + " ms");
     document.getElementById("generated-text").innerText = text;
 }
 
-function postProcessTokens(tokensAsNumbers) {
-    const tokens = new Array(tokensAsNumbers.length);
+function postProcessTokens(tokensAsIDs) {
+    const tokens = convertTokensFromIDToString(tokensAsIDs);
+    return concatenateTokens(tokens);
+}
+
+function convertTokensFromIDToString(tokensAsIDs) {
+    const tokens = new Array(tokensAsIDs.length);
     for (let i = 0; i < tokens.length; i++) {
-        tokens[i] = dictionary.getTokenByID(tokensAsNumbers[i]);
+        tokens[i] = dictionary.getTokenByID(tokensAsIDs[i]);
     }
-    return tokens.join(" ");
+    return tokens;
+}
+
+function concatenateTokens(tokens) {
+    if (tokens.length === 0) {
+        return;
+    }
+
+    // first token without leading space
+    let text = tokens[0] // assigning is safe, strings are always copied
+
+    // concatenate all tokens except first one
+    for (let i = 1; i < tokens.length; i++) {
+        const token = tokens[i];
+        if (SPECIAL_CHARS_WITHOUT_SEPARATION.includes(token)) {
+            // concatenate token without any separation
+            text += token; // += is efficient for concatenation
+        } else {
+            // both cases: special chars with separation and normal words
+            // concatenate token with separation by space
+            text += " ";
+            text += token;
+        }
+        // TODO: small change: AFTER special chars with separation should NOT do separation
+    }
+
+    return text;
 }
