@@ -131,20 +131,21 @@ function generateText() {
     const startText = document.getElementById("start-text").value;
     const startHistory = tokenize(startText);
     if (startHistory.length !== 2) {
-        alert("You need to specify a start text of exactly 2 tokens!\n" +
+        alert("Invalid start text!\n" +
+            "It must include exactly 2 tokens.\n" +
             "Punctuation / special characters count separately.");
         return;
     }
 
     const startHistoryAsIDs = convertTokensFromStringToID(startHistory);
     if (!isStartHistoryValid(startHistoryAsIDs)) {
-        alert("Invalid start text! It must appear somewhere in the training text!");
+        alert("Invalid start text!\nIt must appear somewhere in the training text.");
         return;
     }
 
     const length = document.getElementById("text-length").value;
-    if (!length) {
-        alert("Please specify a valid number for the text length!");
+    if (length === undefined) {
+        alert("Invalid text length!");
         return;
     }
 
@@ -159,7 +160,7 @@ function isStartHistoryValid(startHistory) {
         return false;
     }
     // TODO: better return undefined for consistency
-    return model.findNGramByHistory(startHistory) !== -1;
+    return model.findNGramByHistory(startHistory) !== undefined;
 }
 
 function generateTextFromStartHistory(startHistory, length) {
